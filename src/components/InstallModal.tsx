@@ -11,7 +11,7 @@ export default function InstallModal({ isOpen, onClose }: InstallModalProps) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && !isDownloading) {
+    if (isOpen) {
       setCountdown(3);
       setIsDownloading(true);
       
@@ -24,6 +24,8 @@ export default function InstallModal({ isOpen, onClose }: InstallModalProps) {
               // Replace with your actual APK download URL
               const apkUrl = import.meta.env.VITE_APP_URL;
               window.location.href = apkUrl;
+              // Close modal after download starts
+              onClose();
             }, 500);
             return 0;
           }
@@ -31,9 +33,16 @@ export default function InstallModal({ isOpen, onClose }: InstallModalProps) {
         });
       }, 1000);
 
-      return () => clearInterval(timer);
+      return () => {
+        clearInterval(timer);
+        setIsDownloading(false);
+      };
+    } else {
+      // Reset state when modal closes
+      setIsDownloading(false);
+      setCountdown(3);
     }
-  }, [isOpen, isDownloading]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -120,6 +129,7 @@ export default function InstallModal({ isOpen, onClose }: InstallModalProps) {
             onClick={() => {
               const apkUrl = import.meta.env.VITE_APP_URL;
               window.location.href = apkUrl;
+              onClose();
             }}
             className="w-full mt-4 bg-[#01875f] hover:bg-[#016d4c] text-white font-medium text-sm py-2 px-4 rounded-lg transition-colors"
           >
